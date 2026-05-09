@@ -1,0 +1,9 @@
+{
+  "name": "bibliophile",
+  "private": true,
+  "description": "Root workspace: Vercel runs npm ci + npm run build → static files in frontend/dist only.",
+  "workspaces": ["frontend"],
+  "scripts": {
+    "build": "npm run build -w frontend"
+  }
+}

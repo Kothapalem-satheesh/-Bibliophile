@@ -41,6 +41,18 @@ Local dev stays unchanged: leave `VITE_API_URL` unset and run `uvicorn` on port 
 
 See `frontend/.env.example` for a template.
 
+### If Vercel shows “Serverless Function has crashed” (500)
+
+This project’s **API does not run on Vercel** — only the **static Vite build** in **`frontend/dist`** should deploy. A 500 here almost always means the deployment is still **old** (see commit hash on the deployment) or Vercel is **not** using the static build output.
+
+1. **Push the latest commit** from this repo (root **`package.json`** workspaces + **`package-lock.json`** + **`vercel.json`** without serverless rewrites). If Vercel still shows **`first commit` / `c30fc8d`**, you have not deployed the fix yet — trigger **Redeploy** after `git push`.
+2. **Project → Settings → General:** leave **Root Directory** empty (repo root), unless you switch to the alternate layout below.
+3. **Project → Settings → General → Build & Development:** turn **off** any manual overrides that force **Python**, **Other runtimes**, or a custom **Output** that is not `frontend/dist`. The repo’s **`vercel.json`** should supply: **Install** `npm ci`, **Build** `npm run build`, **Output** `frontend/dist`.
+4. **Alternate layout:** set **Root Directory** to **`frontend`**, Framework **Vite**, **Build** `npm run build`, **Output** `dist` (then the root `vercel.json` is ignored — that is fine).
+5. Set **`VITE_API_URL`** to your real FastAPI URL (no trailing slash).
+
+Check **Deployments → … → Build Logs** (build must succeed) and **Functions** tab — for a pure static site you should see **no** Python functions.
+
 ## Models
 
 - **Hybrid** (default) — 60% collaborative + 40% content-based

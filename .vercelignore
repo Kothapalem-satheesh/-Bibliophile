@@ -1,0 +1,6 @@
+# Keep Python/data/notebooks out of the upload — avoids mistaken Python/serverless detection.
+app.py
+requirements.txt
+artifacts/
+data/
+*.ipynb
