@@ -2,6 +2,9 @@
   "name": "bibliophile",
   "private": true,
   "description": "Root workspace: Vercel runs npm ci + npm run build → static files in frontend/dist only.",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "workspaces": ["frontend"],
   "scripts": {
     "build": "npm run build -w frontend"

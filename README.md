@@ -41,6 +41,7 @@ If Vercel tries to build **FastAPI**, the deployment will fail or behave wrongly
 1. **Project → Settings → General → Root Directory:** set to **`frontend`** (single folder only — no `app.py` in scope).
 2. **Framework Preset:** **Vite** (not “Automatic” if it picks FastAPI, and never **FastAPI**).
 3. Leave **Build Command** `npm run build` and **Output Directory** **`dist`** (defaults match `frontend/vercel.json`).
+4. **Node.js:** Vite 8 needs Node **≥ 20.19**. The repo sets **`engines`** and **`frontend/.nvmrc`**. If the build still fails with Rollup/Rolldown binding errors, set Node to **22.x** under **Project → Settings → General → Node.js Version**, or add env **`NODE_VERSION`** = **`22`**, then redeploy.
 
 **Alternative (deploy from repo root):**
 
