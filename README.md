@@ -32,26 +32,38 @@ npm run dev
 
 Vercel hosts the **React build only**. The **FastAPI** app must run somewhere else (Render, Railway, Fly.io, your VPS, etc.) with your `artifacts/*.pkl` present on that host.
 
-1. Push this repo to GitHub/GitLab and import it in [Vercel](https://vercel.com). Use the repository **root** that contains `vercel.json` (the folder with `app.py` and `frontend/`).
-2. In Vercel → Project → **Settings → Environment Variables**, add:
-   - **`VITE_API_URL`** — full origin of your FastAPI deployment, **no trailing slash** (example: `https://book-api-xxxx.onrender.com`).
-3. Redeploy after changing env vars (Vite bakes this value in at build time).
+### Required Vercel settings (avoid FastAPI / Python builds)
+
+If Vercel tries to build **FastAPI**, the deployment will fail or behave wrongly — this repo is **not** meant to run Python on Vercel.
+
+**Recommended (simplest):**
+
+1. **Project → Settings → General → Root Directory:** set to **`frontend`** (single folder only — no `app.py` in scope).
+2. **Framework Preset:** **Vite** (not “Automatic” if it picks FastAPI, and never **FastAPI**).
+3. Leave **Build Command** `npm run build` and **Output Directory** **`dist`** (defaults match `frontend/vercel.json`).
+
+**Alternative (deploy from repo root):**
+
+1. **Root Directory:** leave **empty**.
+2. **Framework Preset:** **Other** or ensure Vercel uses **Node** / your root **`package.json`** workspaces — **do not** select **FastAPI**.
+3. Build should run **`npm ci`** → **`npm run build`** → output **`frontend/dist`** per root **`vercel.json`**.
+
+Then:
+
+- **Environment Variables:** **`VITE_API_URL`** — full origin of your FastAPI deployment, **no trailing slash** (example: `https://book-api-xxxx.onrender.com`).
+- Redeploy after changing env vars (Vite bakes this value in at build time).
 
 Local dev stays unchanged: leave `VITE_API_URL` unset and run `uvicorn` on port 8000; the Vite dev server proxies `/api` to it.
 
 See `frontend/.env.example` for a template.
 
+### If Vercel build fails: “No FastAPI entrypoint found”
+
+That means the project is configured as **FastAPI** while **`app.py` was excluded** from the upload (old `.vercelignore`) or Python mode should not be used at all. **Fix:** follow **Required Vercel settings** above (Root **`frontend`** + **Vite**), or turn off the FastAPI preset — do not deploy the Python API on Vercel.
+
 ### If Vercel shows “Serverless Function has crashed” (500)
 
-This project’s **API does not run on Vercel** — only the **static Vite build** in **`frontend/dist`** should deploy. A 500 here almost always means the deployment is still **old** (see commit hash on the deployment) or Vercel is **not** using the static build output.
-
-1. **Push the latest commit** from this repo (root **`package.json`** workspaces + **`package-lock.json`** + **`vercel.json`** without serverless rewrites). If Vercel still shows **`first commit` / `c30fc8d`**, you have not deployed the fix yet — trigger **Redeploy** after `git push`.
-2. **Project → Settings → General:** leave **Root Directory** empty (repo root), unless you switch to the alternate layout below.
-3. **Project → Settings → General → Build & Development:** turn **off** any manual overrides that force **Python**, **Other runtimes**, or a custom **Output** that is not `frontend/dist`. The repo’s **`vercel.json`** should supply: **Install** `npm ci`, **Build** `npm run build`, **Output** `frontend/dist`.
-4. **Alternate layout:** set **Root Directory** to **`frontend`**, Framework **Vite**, **Build** `npm run build`, **Output** `dist` (then the root `vercel.json` is ignored — that is fine).
-5. Set **`VITE_API_URL`** to your real FastAPI URL (no trailing slash).
-
-Check **Deployments → … → Build Logs** (build must succeed) and **Functions** tab — for a pure static site you should see **no** Python functions.
+Only the **static** files should run on Vercel. See **Required Vercel settings**; set **`VITE_API_URL`** to your real API; redeploy after **`git pull`** of the latest commit.
 
 ## Models
 

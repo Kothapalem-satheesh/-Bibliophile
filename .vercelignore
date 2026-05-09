@@ -1,6 +1,5 @@
-# Keep Python/data/notebooks out of the upload — avoids mistaken Python/serverless detection.
-app.py
-requirements.txt
+# Optional size trim only — do NOT list app.py/requirements.txt here:
+# if Vercel is set to FastAPI, excluding them breaks the build (“No FastAPI entrypoint”).
 artifacts/
 data/
 *.ipynb
